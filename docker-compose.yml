@@ -9,10 +9,14 @@ services:
       - "8088:8088"
     volumes:
       - .:/app  # Mounts the current directory to /app inside the container
-      - ./hadoop-config:/hadoop/hadoop/etc/hadoop
+      #- hadoop-logs:/hadoop/logs
+      #- /hadoop-config:/hadoop/etc/hadoop
     networks:
       - openjdk_network
     working_dir: /app  # Sets /app as the working directory
+
+# volumes:
+#   hadoop-logs:
 
 networks:
   openjdk_network:
