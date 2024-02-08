@@ -3,12 +3,16 @@ version: '3.8'
 services:
   openjdk11:
     build: .
-    container_name: openjdk11_container
+    container_name: openjdk11_hadoop
     ports:
       - "9870:9870"
       - "8088:8088"
+    volumes:
+      - .:/app  # Mounts the current directory to /app inside the container
+      - ./hadoop-config:/hadoop/hadoop/etc/hadoop
     networks:
       - openjdk_network
+    working_dir: /app  # Sets /app as the working directory
 
 networks:
   openjdk_network:
