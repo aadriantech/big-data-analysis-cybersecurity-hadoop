@@ -43,6 +43,7 @@ ENV HADOOP_HOME=/hadoop \
     HDFS_NAMENODE_USER=hadoop \
     HDFS_DATANODE_USER=hadoop \
     HDFS_SECONDARYNAMENODE_USER=hadoop \
+    HADOOP_MAPRED_HOME=/hadoop \
     JAVA_HOME=/usr/local/openjdk-11
 
 RUN mkdir -p /hadoop/logs && \
