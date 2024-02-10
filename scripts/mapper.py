@@ -18,7 +18,8 @@ def main(separator='\t'):
         #
         # Tab-delimited; the trivial word count is 1
         for word in words:
-            print(f"{word}{separator}1")
+            print("%s%s%d" % (word, separator, 1))
+
 
 if __name__ == "__main__":
     main()
