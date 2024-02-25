@@ -31,9 +31,8 @@ def generate_log():
     duration = random.randint(400, 1000)
     
     # Construct the log entry
-    #log_entry = f"{size},{ip},{status},{duration},{method},http://{domain}{path}{file_name}-{protocol}/{ip_address},{content_type}"
-    log_entry = "{},{},{},{},{},http://{}{}{}-{}{},{content_type}".format(size, ip, status, duration, method, domain, path, file_name, protocol, ip_address, content_type=content_type)
-
+    log_entry = f"{size},{ip},{status},{duration},{method},http://{domain}{path}{file_name}-{protocol}/{ip_address},{content_type}"
+    
     return log_entry
 
 # Generate 1000 logs
@@ -47,4 +46,4 @@ with open(csv_file_path, "w", newline='') as file:
     for log in logs:
         writer.writerow(log.split(','))
 
-print("Generated 1000 logs and saved to {}".format(csv_file_path))
+print(f"Generated 1000 logs and saved to {csv_file_path}")

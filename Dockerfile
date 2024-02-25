@@ -5,7 +5,14 @@ FROM openjdk:11-jdk-buster
 RUN apt-get update && apt-get install -y \
     vim \
     net-tools \
-    openssh-server
+    openssh-server \
+    python3 python3-pip
+
+# Set python3 as the default python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+# Link pip3 to pip if needed
+RUN if [ -e /usr/bin/pip3 ] && [ ! -e /usr/bin/pip ]; then ln -s /usr/bin/pip3 /usr/bin/pip; fi
 
 # Configure SSH (optional steps)
 RUN mkdir /var/run/sshd
