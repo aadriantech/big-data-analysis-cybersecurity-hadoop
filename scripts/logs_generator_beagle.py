@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import random
 import csv
 
@@ -28,18 +31,20 @@ def generate_log():
     duration = random.randint(400, 1000)
     
     # Construct the log entry
-    log_entry = f"{size},{ip},{status},{duration},{method},http://{domain}{path}{file_name}-{protocol}/{ip_address},{content_type}"
-    
+    #log_entry = f"{size},{ip},{status},{duration},{method},http://{domain}{path}{file_name}-{protocol}/{ip_address},{content_type}"
+    log_entry = "{},{},{},{},{},http://{}{}{}-{}{},{content_type}".format(size, ip, status, duration, method, domain, path, file_name, protocol, ip_address, content_type=content_type)
+
     return log_entry
 
 # Generate 1000 logs
 logs = [generate_log() for _ in range(1000)]
 
-# Save the logs to a CSV file
-with open("generated_logs.csv", "w", newline='') as file:
+# Save the logs to a CSV file in the /app/runtime folder
+csv_file_path = "/app/runtime/generated_logs.csv"  # Adjusted path
+with open(csv_file_path, "w", newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["Size", "IP", "Status", "Duration", "Method", "URL", "Content-Type"])  # Header
     for log in logs:
         writer.writerow(log.split(','))
 
-print("Generated 1000 logs and saved to generated_logs.csv")
+print("Generated 1000 logs and saved to {}".format(csv_file_path))
