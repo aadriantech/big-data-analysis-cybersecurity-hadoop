@@ -64,7 +64,7 @@ RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /home/hadoop/.bashrc && \
     echo "export PATH=${PATH}:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin" >> /home/hadoop/.bashrc
 
 # Install Python Libraries
-RUN pip install pydoop
+RUN pip install pydoop plotly pandas
 
 # Creating necessary directories and setting permissions
 RUN mkdir -p /hadoop/logs && \

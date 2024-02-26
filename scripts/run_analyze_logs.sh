@@ -6,7 +6,8 @@ python /app/scripts/prepare_hdfs_environment.py /app/runtime/generated_logs_ssh.
 
 # Run the Java streaming command to run the mapper and 
 # the reducer for Beagle Worm Analysis
-#hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
+hdfs dfs -rm -r /Wordcount
+hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
   -files "/app/scripts/mapper_w32beagle.py,/app/scripts/reducer_w32beagle.py" \
   -mapper "python mapper_w32beagle.py" \
   -reducer "python reducer_w32beagle.py" \
@@ -28,6 +29,7 @@ hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
 
 hdfs dfs -ls /WordcountSsh
 
-#hdfs dfs -cat /logs/generated_logs_beagle.csv | python /app/scripts/mapper_w32beagle.py | sort
-#hdfs dfs -cat /logs/generated_logs_ssh.csv | python /app/scripts/mapper_ssh_failed.py | sort | python /app/scripts/reducer_ssh_failed.py
+# Debugging commands
+# hdfs dfs -cat /logs/generated_logs_beagle.csv | python /app/scripts/mapper_w32beagle.py | sort
+# hdfs dfs -cat /logs/generated_logs_ssh.csv | python /app/scripts/mapper_ssh_failed.py | sort | python /app/scripts/reducer_ssh_failed.py
 # hdfs dfs -cat /WordcountSsh/part-00000
