@@ -39,7 +39,7 @@ def generate_log():
 logs = [generate_log() for _ in range(1000)]
 
 # Save the logs to a CSV file in the /app/runtime folder
-csv_file_path = "/app/runtime/generated_logs.csv"  # Adjusted path
+csv_file_path = "/app/runtime/generated_logs_beagle.csv"  # Adjusted path
 with open(csv_file_path, "w", newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["Size", "IP", "Status", "Duration", "Method", "URL", "Content-Type"])  # Header

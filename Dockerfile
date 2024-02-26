@@ -6,13 +6,17 @@ RUN apt-get update && apt-get install -y \
     vim \
     net-tools \
     openssh-server \
-    python3 python3-pip
+    python3 python3-pip \
+    sudo
 
 # Set python3 as the default python
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 # Link pip3 to pip if needed
 RUN if [ -e /usr/bin/pip3 ] && [ ! -e /usr/bin/pip ]; then ln -s /usr/bin/pip3 /usr/bin/pip; fi
+
+# Install Python Libraries
+RUN pip install pydoop
 
 # Configure SSH (optional steps)
 RUN mkdir /var/run/sshd
