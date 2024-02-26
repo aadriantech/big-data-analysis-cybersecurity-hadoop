@@ -15,9 +15,6 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 # Link pip3 to pip if needed
 RUN if [ -e /usr/bin/pip3 ] && [ ! -e /usr/bin/pip ]; then ln -s /usr/bin/pip3 /usr/bin/pip; fi
 
-# Install Python Libraries
-RUN pip install pydoop
-
 # Configure SSH (optional steps)
 RUN mkdir /var/run/sshd
 RUN echo 'root:root' | chpasswd
@@ -30,16 +27,19 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Creating hadoop user
 RUN adduser --disabled-password --gecos "" hadoop && \
-    su hadoop -c "ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && chmod 0700 ~/.ssh"
+    su - hadoop -c "ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && chmod 0700 ~/.ssh"
 
-RUN wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
-RUN mkdir /hadoop && \
+# Download and setup Hadoop
+RUN wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz && \
+    mkdir /hadoop && \
     tar -xvzf hadoop-3.3.6.tar.gz -C /hadoop && \
     cd /hadoop && \
     mv hadoop-3.3.6/* . && \
     rmdir hadoop-3.3.6
 
+# Setting environment variables for Hadoop and Java
 ENV HADOOP_HOME=/hadoop \
     HADOOP_INSTALL=/hadoop \
     HADOOP_MAPRED_HOME=/hadoop \
@@ -49,23 +49,32 @@ ENV HADOOP_HOME=/hadoop \
     HADOOP_COMMON_LIB_NATIVE_DIR=/hadoop/lib/native \
     PATH=$PATH:/hadoop/sbin:/hadoop/bin \
     HADOOP_OPTS="-Djava.library.path=/hadoop/lib/native" \
+    JAVA_HOME=/usr/local/openjdk-11 \
     YARN_RESOURCEMANAGER_USER=hadoop \
     YARN_NODEMANAGER_USER=hadoop \
     HDFS_NAMENODE_USER=hadoop \
     HDFS_DATANODE_USER=hadoop \
     HDFS_SECONDARYNAMENODE_USER=hadoop \
-    HADOOP_MAPRED_HOME=/hadoop \
-    JAVA_HOME=/usr/local/openjdk-11
+    HADOOP_CONF_DIR=/hadoop/etc/hadoop
 
+# Configure environment variables specifically for the hadoop user
+RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /home/hadoop/.bashrc && \
+    echo "export HADOOP_HOME=${HADOOP_HOME}" >> /home/hadoop/.bashrc && \
+    echo "export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop" >> /home/hadoop/.bashrc && \
+    echo "export PATH=${PATH}:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin" >> /home/hadoop/.bashrc
+
+# Install Python Libraries
+RUN pip install pydoop
+
+# Creating necessary directories and setting permissions
 RUN mkdir -p /hadoop/logs && \
     chown -R hadoop:hadoop /hadoop/logs && \
-    chmod -R 755 /hadoop/logs
-
-RUN mkdir -p ~/hadoopdata/hdfs/namenode && mkdir -p ~/hadoopdata/hdfs/datanode
+    chmod -R 755 /hadoop/logs && \
+    mkdir -p ~/hadoopdata/hdfs/namenode && \
+    mkdir -p ~/hadoopdata/hdfs/datanode
 
 # Expose the SSH port
 EXPOSE 22
 
 # Use the entrypoint script to start services
-ENTRYPOINT /entrypoint.sh
-
+ENTRYPOINT ["/entrypoint.sh"]

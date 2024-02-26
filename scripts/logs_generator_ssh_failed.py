@@ -13,7 +13,7 @@ def generate_sshd_log():
     
     # Sample usernames and IP addresses
     usernames = ["admin", "fluffy", "slasher", "sifak", "guest", "test"]
-    ip_addresses = ["200.30.175.162", "192.168.1.1", "172.16.0.1", "10.0.0.1"]
+    ip_addresses = ["200.30.175.162", "172.16.0.1"]    
     
     # Random selections for the log
     username = random.choice(usernames)

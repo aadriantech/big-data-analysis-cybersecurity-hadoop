@@ -24,6 +24,12 @@ else
     echo "Initialization completed and marked as done."
 fi
 
+# Generate logs before starting Hadoop services
+echo "[ENTRYPOINT] Generating logs..."
+python /app/scripts/logs_generator_beagle.py
+python /app/scripts/logs_generator_ssh_failed.py
+echo "[ENTRYPOINT] Logs generation completed."
+
 # Start Hadoop services
 echo "[ENTRYPOINT] Starting cluster.."
 $HADOOP_HOME/sbin/start-dfs.sh
@@ -40,12 +46,3 @@ netstat -tuln | grep -E "9870|8088"
 # Keep the container running
 echo "[ENTRYPOINT] Startup completed!"
 tail -f /dev/null
-
-
-# su hadoop
-# hdfs dfs -mkdir -p /var/log && hdfs dfs -put /var/log/alternatives.log /var/log/alternatives.log
-
-# hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \-file "/app/scripts/mapper.py" -mapper "python3 /app/scripts/mapper.py" \-file "/app/scripts/reducer.py" -reducer "python3 /app/scripts/reducer.py" \-input /var/log/alternatives.log -output /hadoop-output/Wordcount
-# hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \-files "/app/scripts/mapper.py","/app/scripts/reducer.py" -mapper "python3 /app/scripts/mapper.py" -reducer "python3 /app/scripts/reducer.py" \-input /var/log/alternatives.log -output /hadoop-output/Wordcount
-# hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \-files "/app/scripts/mapper.py","/app/scripts/reducer.py" -mapper "/usr/local/openjdk-11/bin/java mapper.py" -reducer "/usr/local/openjdk-11/bin/java reducer.py" \-input /var/log/alternatives.log -output /hadoop-output/Wordcount
-# hadoop jar /hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar -files "/app/scripts/mapper.py,/app/scripts/reducer.py" -mapper "python mapper.py" -reducer "python reducer.py" -input "hdfs://localhost:9000/var/log/alternatives.log" -output "/hadoop-output/Wordcount"

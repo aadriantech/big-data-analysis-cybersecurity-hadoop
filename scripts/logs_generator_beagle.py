@@ -6,7 +6,9 @@ import csv
 
 def generate_log():
     # Base parts of the log entries
-    ip = "192.168.2.204"
+    # Base parts of the log entries
+    ips = ["192.168.2.204", "192.168.2.205"]  # Two different source IPs
+    ip = random.choice(ips)  # Randomly choose between the two IPs    
     status = "TCP_MISS/404"
     methods = ["GET"]
     domains = ["www.ordendeslichts.de", "www.levada.ru", "www.etype.hostingcity.net",
