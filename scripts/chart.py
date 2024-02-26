@@ -1,37 +1,31 @@
-import subprocess
 import pandas as pd
 import plotly.express as px
 import pydoop.hdfs as hdfs
 
-# Step 1: Define and execute the Hadoop streaming command
-# Note: Adjust the paths and filenames as necessary
-hadoop_command = [
-    "hadoop", "jar", "/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar",
-    "-files", "hdfs://localhost:9000/path/to/mapper.py,hdfs://localhost:9000/path/to/reducer.py",
-    "-mapper", "python mapper.py",
-    "-reducer", "python reducer.py",
-    "-input", "hdfs://localhost:9000/path/to/input",
-    "-output", "hdfs://localhost:9000/path/to/output"
-]
+# Specify the directory containing your MapReduce output files
+output_dir = 'hdfs://localhost:9000/WordcountSsh/part-00000'
 
-subprocess.run(hadoop_command, check=True)
+# List all the part-r-* files in the directory
+files = hdfs.ls(output_dir)
+part_files = [file for file in files if 'part-r-' in file]
 
-# Step 2: Read the Hadoop job output from HDFS
-output_path = 'hdfs://localhost:9000/path/to/output/part-r-00000'
+data = []  # Initialize an empty list to store data from all files
 
-with hdfs.open(output_path, "rt") as f:
-    data = f.readlines()
+# Iterate through each part file and append its data
+for part_file in part_files:
+    with hdfs.open(part_file, "rt") as f:
+        for line in f:
+            data.append(line.strip().split('\t'))
 
-# Step 3: Process the data
-processed_data = [line.strip().split('\t') for line in data]
-df = pd.DataFrame(processed_data, columns=['Key', 'Value'])
-
-# Convert 'Value' column to numeric
+# Process the combined data
+df = pd.DataFrame(data, columns=['Key', 'Value'])
 df['Value'] = pd.to_numeric(df['Value'])
 
-# Step 4: Generate a simple bar chart using Plotly
+# Generate a simple bar chart using Plotly
 fig = px.bar(df, x='Key', y='Value', title='MapReduce Results Visualization')
 
-# Step 5: Save the figure as an HTML file
-# Adjust the file path as necessary
-fig.write_html("mapreduce_results.html")
+# Save the figure as an HTML file
+html_file_path = '/app/runtime/mapreduce_results.html'
+fig.write_html(html_file_path)
+
+print(f"Visualization saved as HTML at {html_file_path}")
